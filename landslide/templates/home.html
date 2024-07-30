@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Landslide Detection{% endblock %}
+
+{% block content %}
+<style>
+    .blue-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 10px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition-duration: 0.4s;
+    }
+    
+    .blue-button:hover {
+        background-color: #0056b3;
+    }
+    
+    .images-container {
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        margin-top: 20px;
+    }
+    
+    .image-container {
+        text-align: center;
+    }
+    
+    img {
+        width: 80%;
+        max-width: 1000px;
+        height: auto;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    
+    #results {
+        margin-top: 20px;
+    }
+    
+    h2, h3 {
+        color: #333;
+    }
+    
+    p {
+        font-size: 16px;
+        color: #555;
+    }
+    
+    .key-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .key-item {
+        display: flex;
+        align-items: center;
+        margin-right: 20px;
+    }
+    
+    .key-color {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border: 1px solid #000;
+    }
+    
+    .key-color.black {
+        background-color: #000;
+    }
+    
+    .key-color.green {
+        background-color: #00ff00;
+    }
+    
+    .key-color.red {
+        background-color: #ff0000;
+    }
+</style>
+
+<h1 align="center">Landslide Detection</h1>
+<form align="center" id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <input type="submit" value="Predict" class="blue-button">
+</form>
+<div align="center" id="results" style="display: none;">
+    <h2>Results</h2>
+    <div class="images-container">
+        <div class="image-container">
+            <h3>Uploaded Image</h3>
+            <img id="uploaded-image" src="" alt="Uploaded Image">
+        </div>
+        <div class="image-container">
+            <h3>Prediction Image</h3>
+            <img id="prediction-image" src="" alt="Prediction Image">
+        </div>
+    </div>
+    <div id="explanation">
+        <h3>Recommendations</h3>
+        
+        <div class="key-container">
+            <div class="key-item">
+                <div class="key-color black"></div>
+                <p>Safe and not susceptible to landslides.</p>
+            </div>
+            <div class="key-item">
+                <div class="key-color green"></div>
+                <p>Might be susceptible to landslides.</p>
+            </div>
+            <div class="key-item">
+                <div class="key-color red"></div>
+                <p>Highest chances of landslide occurring.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('upload-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        document.getElementById('uploaded-image').src = data.uploaded_image;
+        document.getElementById('prediction-image').src = data.prediction_image;
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('explanation').style.display = 'block';
+    });
+</script>
+{% endblock %}
